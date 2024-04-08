@@ -43,6 +43,7 @@ async def main(args: argparse.Namespace):
         services=args.services,
     ) as client:
         logger.info("connected")
+        logger.info(client.address)
 
         for service in client.services:
             logger.info("[Service] %s", service)
