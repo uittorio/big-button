@@ -2,3 +2,5 @@
 .idea
 address.txt
 projectspath.txt
+settings.toml
+__pycache__
