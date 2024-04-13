@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-def walk_and_run_mob_next(directory):
+def mob_next(directory):
     for root, dirs, files in os.walk(directory):
         for name in dirs:
             path = os.path.join(root, name)
@@ -28,12 +28,3 @@ def run_git_status(path):
 
 def run_mob_next(path):
     return subprocess.run(["mob", "next"], capture_output=True, text=True, cwd=path)
-
-
-def get_projects_path():
-    with open("projectspath.txt", "r") as file:
-        return file.read()
-
-
-def mob_next():
-    walk_and_run_mob_next(get_projects_path())
