@@ -16,6 +16,7 @@ from ble_advertising import advertising_payload
 from micropython import const
 
 BUTTON = machine.Pin(14)
+LED = machine.Pin("LED")
 
 _IRQ_CENTRAL_CONNECT = const(1)
 _IRQ_CENTRAL_DISCONNECT = const(2)
@@ -91,6 +92,10 @@ def start():
     p = BLESimplePeripheral(ble)
 
     def on_rx(v):
+        if v == b'\x01':
+            LED.value(1)
+        if v == b'\x02':
+            LED.value(0)
         print("RX", v)
 
     p.on_write(on_rx)
@@ -99,14 +104,15 @@ def start():
     while True:
         if p.is_connected():
             buttonValue = BUTTON.value()
-            
+
             if BUTTON.value() == 1 and _previousButtonValue != buttonValue:
                 p.send("go")
-                
-            _previousButtonValue = buttonValue            
-            
+
+            _previousButtonValue = buttonValue
+
         time.sleep_ms(100)
 
 
 if __name__ == "__main__":
     start()
+

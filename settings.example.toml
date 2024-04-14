@@ -1,6 +1,7 @@
 [pico]
 address = "00:00:00:00:00:00"
 bluetooth_service_uuid = "00000000-0000-0000-0000-000000000000"
+bluetooth_service_uuid_tx = "00000000-0000-0000-0000-000000000000"
 
 [local]
 projects_paths = ["/absolute/path/to/projects/root"]
