@@ -2,20 +2,21 @@ import os
 import subprocess
 
 
-def mob_next(directory):
-    for root, dirs, files in os.walk(directory):
-        for name in dirs:
-            path = os.path.join(root, name)
-            mob_status_result = run_mob_status(path)
-            if "you are on wip branch mob" in mob_status_result.stdout:
-                git_status_result = run_git_status(path)
-                if "nothing to commit, working tree clean" not in git_status_result.stdout:
-                    print(f"Found mob branch with changes in {path}")
-                    mob_next_result = run_mob_next(path)
-                    print(mob_next_result.stdout)
-                    return
+def mob_next(paths):
+    for directory in paths:
+        for root, dirs, files in os.walk(directory):
+            for name in dirs:
+                path = os.path.join(root, name)
+                mob_status_result = run_mob_status(path)
+                if "you are on wip branch mob" in mob_status_result.stdout:
+                    git_status_result = run_git_status(path)
+                    if "nothing to commit, working tree clean" not in git_status_result.stdout:
+                        print(f"Found mob branch with changes in {path}")
+                        mob_next_result = run_mob_next(path)
+                        print(mob_next_result.stdout)
+                        return
 
-        break
+            break
 
 
 def run_mob_status(path):

@@ -6,5 +6,5 @@ async def get_config():
         settings = tomllib.load(f)
         address = settings["pico"]["address"]
         bluetooth_service_uuid = settings["pico"]["bluetooth_service_uuid"]
-        projects_path = settings["local"]["projects_path"]
-        return address, bluetooth_service_uuid, projects_path
+        projects_paths = settings["local"]["projects_paths"]
+        return address, bluetooth_service_uuid, projects_paths
