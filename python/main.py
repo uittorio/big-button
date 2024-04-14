@@ -14,13 +14,13 @@ def execute_mob_next_for_projects(projects_path: str):
 
 
 async def main():
-    address, bluetooth_service_uuid, projects_path, projects_paths = await get_config()
+    address, bluetooth_service_uuid, projects_paths = await get_config()
 
     print("Start searching...")
     while True:
         async with BleakClient(address) as client:
             print("Connected!")
-            await client.start_notify(bluetooth_service_uuid, execute_mob_next_for_projects(projects_path))
+            await client.start_notify(bluetooth_service_uuid, execute_mob_next_for_projects(projects_paths))
             while client.is_connected:
                 one_second = 1
                 await asyncio.sleep(one_second)
