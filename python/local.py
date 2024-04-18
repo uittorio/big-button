@@ -19,10 +19,10 @@ class LocalHandler:
 
 
 async def main():
-    address, bluetooth_service_uuid, bluetooth_service_uuid_tx, projects_paths = await get_config()
+    config = await get_config()
 
     handler = LocalHandler()
-    await MobNext.create(handler, projects_paths)
+    await MobNext.create(config.handler, config.projects_paths, config.verbose)
 
     await handler.run()
 
