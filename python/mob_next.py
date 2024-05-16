@@ -4,8 +4,7 @@ import re
 
 
 class MobNext:
-    def __init__(self, handler, paths, verbose=True):
-        self.handler = handler
+    def __init__(self, paths, verbose=True):
         self.paths = paths
         if verbose:
             self.printer = VerboseMobNextPrinter()
@@ -13,19 +12,24 @@ class MobNext:
             self.printer = SilentMobNextPrinter()
 
     @classmethod
-    async def create(cls, handler, paths, verbose):
-        mob_next = MobNext(handler, paths, verbose)
-
-        def _run_cb():
-            async def __run():
-                await mob_next._run()
-            return __run
-
-        await handler.on_notify(_run_cb())
+    def create(cls, paths, verbose):
+        mob_next = MobNext(paths, verbose)
         return mob_next
 
-    async def _run(self):
-        await self.handler.on_start()
+    async def list_mob_branches(self):
+        for directory in self.paths:
+            for root, dirs, files in os.walk(directory):
+                for name in dirs:
+                    path = os.path.join(root, name)
+                    mob_status_result = self.run_mob_status(path)
+                    if "you are on wip branch mob" in mob_status_result.stdout:
+                        git_status_result = self.run_git_status(path)
+                        if "nothing to commit, working tree clean" not in git_status_result.stdout:
+                            self.printer.print_mob_branch_found(path)
+
+                break
+
+    async def run(self):
         for directory in self.paths:
             for root, dirs, files in os.walk(directory):
                 for name in dirs:
@@ -37,13 +41,11 @@ class MobNext:
                             self.printer.print_mob_branch_found(path)
                             mob_next_result = self.run_mob_next(path)
                             self.printer.print_mob_next_done(mob_next_result.stdout)
-                            await self.handler.on_end()
                             return
 
                 break
 
         self.printer.print_no_mob_branches_found()
-        await self.handler.on_end()
 
     @staticmethod
     def run_mob_status(path):
