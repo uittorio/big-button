@@ -32,7 +32,6 @@ class PicoBluetoothHandler:
     async def on_notify(self):
         async def await_run(_, data):
             await self.on_start()
-            print(data)
             if data == b'\x01':
                 await self.mob.next()
             if data == b'\x02':
