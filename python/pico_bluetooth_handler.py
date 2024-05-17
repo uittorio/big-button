@@ -30,9 +30,13 @@ class PicoBluetoothHandler:
         await self.client.write_gatt_char(self.tx, bytearray([0x02]), response=True)
 
     async def on_notify(self):
-        async def await_run(_, __):
+        async def await_run(_, data):
             await self.on_start()
-            await self.mob.next()
+            print(data)
+            if data == b'\x01':
+                await self.mob.next()
+            if data == b'\x02':
+                await self.mob.start()
             await self.on_end()
 
         await self.client.start_notify(self.rx, await_run)
