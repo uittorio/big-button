@@ -4,13 +4,13 @@ from bleak import BleakClient
 
 
 class PicoBluetoothHandler:
-    def __init__(self, address, rx, tx, runner):
+    def __init__(self, address, rx, tx, mob):
         self.client = None
         self.address = address
         self.rx = rx
         self.tx = tx
         self.client = BleakClient(self.address)
-        self.runner = runner
+        self.mob = mob
 
     async def __aenter__(self):
         print("Connecting")
@@ -32,7 +32,7 @@ class PicoBluetoothHandler:
     async def on_notify(self):
         async def await_run(_, __):
             await self.on_start()
-            await self.runner.run()
+            await self.mob.next()
             await self.on_end()
 
         await self.client.start_notify(self.rx, await_run)
