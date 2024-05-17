@@ -41,7 +41,7 @@ _UART_SERVICE = (
     (_UART_TX, _UART_RX),
 )
 
-previousButtonValue = None
+button_pressed = False
 
 class BLESimplePeripheral:
     def __init__(self, ble, name="mpy-uart"):
@@ -88,7 +88,7 @@ class BLESimplePeripheral:
 
 
 def start():
-    global previousButtonValue
+    global button_pressed
     ble = bluetooth.BLE()
     p = BLESimplePeripheral(ble)
 
@@ -107,18 +107,20 @@ def start():
         if p.is_connected():
             button_value = BUTTON.value()
 
-            if button_value == 1 and previousButtonValue is None:
+            if button_value == 1 and button_pressed is False:
                 start_time = time.time()
-                previousButtonValue = button_value
-            elif button_value == 0 and previousButtonValue == 1:
-                end_time = time.time()
-                if end_time - start_time < 1:
-                    # short press
-                    p.send(bytearray([0x01]))
-                else:
-                    # long press
-                    p.send(bytearray([0x02]))
-                previousButtonValue = None
+                button_pressed = True
+            elif button_value == 0 and button_pressed is True:
+                # short press
+                p.send(bytearray([0x01]))
+                button_pressed = False
+            elif button_value == 0 and button_pressed is None:
+                # reset
+                button_pressed = False
+            elif button_value == 1 and button_pressed is True and time.time() - start_time > 1:
+                # long press
+                p.send(bytearray([0x02]))
+                button_pressed = None
 
         time.sleep_ms(100)
 
