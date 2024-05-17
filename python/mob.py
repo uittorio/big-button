@@ -37,11 +37,15 @@ class Mob:
                     path = os.path.join(root, name)
                     mob_status_result = self.run_mob_status(path)
                     if "you are on wip branch mob" in mob_status_result.stdout:
+                        self.run_git_remote_update(path)
                         git_status_result = self.run_git_status(path)
                         if "nothing to commit, working tree clean" not in git_status_result.stdout:
-                            self.printer.print_mob_branch_with_changes_found(path)
-                            mob_next_result = self.run_mob_next(path)
-                            self.printer.print_mob_next_done(mob_next_result.stdout)
+                            if "branch is up-to-date with" not in git_status_result.stdout:
+                                self.printer.print_mob_next_blocked(path)
+                            else:
+                                self.printer.print_mob_branch_with_changes_found(path)
+                                mob_next_result = self.run_mob_next(path)
+                                self.printer.print_mob_next_done(mob_next_result.stdout)
                             return
 
                 break
@@ -112,6 +116,10 @@ class VerboseMobNextPrinter:
         print("mob next")
 
     @staticmethod
+    def print_mob_next_blocked(path):
+        print(f"Found mob branch not up-to-date with remote in {path}")
+
+    @staticmethod
     def print_mob_next_done(mob_next_result: str):
         print(mob_next_result)
 
@@ -144,6 +152,10 @@ class SilentMobNextPrinter:
     @staticmethod
     def print_mob_next_begin():
         print("↑ ", end="", flush=True)
+
+    @staticmethod
+    def print_mob_next_blocked(path):
+        print(f"✗✗✗ {path} ✗✗✗")
 
     @staticmethod
     def print_mob_next_done(mob_next_result: str):
